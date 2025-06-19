@@ -1,0 +1,194 @@
+{{ 'section-image-carousel.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="image-carousel color-{{ section.settings.color_scheme }} gradient">
+  <div class="section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+    {%- unless section.settings.heading == blank and section.settings.subtext == blank -%}
+      <div class="page-width image-carousel__header">
+        {%- unless section.settings.heading == blank -%}
+          <h2 class="image-carousel__heading {{ section.settings.heading_size }}">
+            {{ section.settings.heading | escape }}
+          </h2>
+        {%- endunless -%}
+        {%- unless section.settings.subtext == blank -%}
+          <div class="image-carousel__subtext rte">
+            {{ section.settings.subtext }}
+          </div>
+        {%- endunless -%}
+      </div>
+    {%- endunless -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <slider-component class="image-carousel__slider-container slider-mobile-gutter">
+
+        <ul
+          class="image-carousel__list slider slider--mobile slider--tablet grid--peek"
+          id="Slider-{{ section.id }}"
+          role="list">
+          {%- for block in section.blocks -%}
+            <li class="image-carousel__item slider__slide" {{ block.shopify_attributes }}>
+              <div class="image-carousel__card">
+                {%- if block.settings.image != blank -%}
+                  <div class="image-carousel__media">
+                    {{
+                      block.settings.image | image_url: width: 400 | image_tag: loading: 'lazy', class: 'image-carousel__image', widths: '165, 360, 535, 750, 1070, 1500', sizes: '(min-width: 990px) 360px, (min-width: 750px) calc((100vw - 130px) / 2), calc((100vw - 50px) / 2)'
+                    }}
+                    {%- unless block.settings.instagram_handle == blank -%}
+                      <div class="image-carousel__handle">
+                        <span class="image-carousel__handle-text">{{ block.settings.instagram_handle | escape }}</span>
+                      </div>
+                    {%- endunless -%}
+                  </div>
+                {%- else -%}
+                  <div class="image-carousel__media image-carousel__media--placeholder">
+                    {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                  </div>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+      </slider-component>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Image Carousel",
+    "tag": "section",
+    "class": "section",
+    "disabled_on": {
+      "groups": ["header", "footer"]
+    },
+    "settings": [
+      {
+        "type": "inline_richtext",
+        "id": "heading",
+        "default": "Image Carousel",
+        "label": "Heading"
+      },
+      {
+        "type": "select",
+        "id": "heading_size",
+        "options": [
+          {
+            "value": "h2",
+            "label": "Small"
+          }, {
+            "value": "h1",
+            "label": "Medium"
+          }, {
+            "value": "h0",
+            "label": "Large"
+          }
+        ],
+        "default": "h1",
+        "label": "Heading size"
+      },
+      {
+        "type": "richtext",
+        "id": "subtext",
+        "default": "<p>Add a subtext to provide more context about your image carousel.</p>",
+        "label": "Subtext"
+      },
+      {
+        "type": "select",
+        "id": "color_scheme",
+        "options": [
+          {
+            "value": "accent-1",
+            "label": "Accent 1"
+          },
+          {
+            "value": "accent-2",
+            "label": "Accent 2"
+          },
+          {
+            "value": "background-1",
+            "label": "Background 1"
+          },
+          {
+            "value": "background-2",
+            "label": "Background 2"
+          }, {
+            "value": "inverse",
+            "label": "Inverse"
+          }
+        ],
+        "default": "background-1",
+        "label": "Color scheme"
+      }, {
+        "type": "header",
+        "content": "Section padding"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 36
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 36
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }, {
+            "type": "text",
+            "id": "instagram_handle",
+            "label": "Instagram Handle",
+            "placeholder": "@username"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Image Carousel",
+        "blocks": [
+          {
+            "type": "image"
+          }, {
+            "type": "image"
+          }, {
+            "type": "image"
+          }, {
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
